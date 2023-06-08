@@ -1,6 +1,3 @@
-# project-template
-This is a GitHub repository in which I added my BSPR assessment
-This is an example
+# BSPR_Assessment
 
-
-
+This is my GitHub repository for the course exercises.
