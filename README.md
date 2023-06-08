@@ -3,9 +3,10 @@ This is a GitHub repository in which I added my BSPR assessment.
 You will find each content in the following folders:
 - R
     - 00_main.R
-    - 01_cleaning.R
-    - 02_analysis.R
-    - 03_plotting.R
+    - 01_libraries.R
+    - 02_cleaning.R
+    - 03_analysis.R
+    - 04_plotting.R
 - data
     - processed
         - cleaned_data.csv
@@ -35,3 +36,4 @@ You will find each content in the following folders:
 - .gitignore
 - README.md
 - project-template.Rproj
+
