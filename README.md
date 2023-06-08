@@ -1,39 +1,6 @@
 # project-template
-This is a GitHub repository in which I added my BSPR assessment. 
-You will find each content in the following folders:
-- R
-    - 00_main.R
-    - 01_libraries.R
-    - 02_cleaning.R
-    - 03_analysis.R
-    - 04_plotting.R
-- data
-    - processed
-        - cleaned_data.csv
-        - processed_data.rds
-    - raw
-        - original_data.csv
-        - spreadsheet_data.xlsx
-- output
-    - figures
-        - 01_figure.png
-        - 02_figure.pdf
-    - tables
-        - 01_table.csv
-        - 02_table.rds
-- products
-    - manuscript
-        - manuscript.docx
-        - manuscript.html
-        - manuscript.pdf
-        - manuscript.qmd
-    - report
-        - report.html
-        - report.qmd
-    - slides
-        - slides.html
-        - slides.qmd
-- .gitignore
-- README.md
-- project-template.Rproj
+This is a GitHub repository in which I added my BSPR assessment
+This is an example
+
+
 
