@@ -1,0 +1,173 @@
+---
+title: "BSPR_assessment"
+format: html
+author: "Sara Ezzat"
+date: "`r date()`"
+output: html_document
+
+---
+
+```{r}
+#| include: false
+#01_libraries
+library(here)
+source(here("R","01_libraries.R"))
+
+```
+
+**The data set is coming from the following project:**
+
+## Mechanisms of insect-egg induced inter-plant communication
+
+### Introduction of the topic and research questions
+
+Plants are chatterboxes^1^, especially when it comes to communicate a potential threat^2^ to activate appropriate defense mechanisms^3^. The inter-plant communication is carried out by a chemical molecule which can be either volatile^3^ or soil- diffusible^4^ to reach neighbouring plants.
+
+The systemic acquired resistance (SAR) is a defense mechanism induced in plants by local pathogens infections^5^ or insect oviposition^6^. SAR activation also induces a systemic resistance against microbial pathogens^7^ in the plant to fight bacterial growth in a similar way as the PAMP- triggered immunity^8^. It has been discovered that the oviposition of the butterfly *Pieris brassicae* on an *Arabidopsis thaliana*’s leaf triggers both a broad and local accumulation of salicylic acid (SA) in the leaves, which leads to the SAR mechanism activation^6,7^.
+Interestingly, SAR-activated plants seem to be able to relay the signal to uninfected plant, allowing them to mount a SAR response before being attacked^9^. The exact nature of the molecule carrying the SAR signal from the infected plants to the healthy ones remains elusive. However it has been demonstrated that this compound is not volatile but soil-diffusible^9^.
+
+Thus it most likely diffuses under the form of a gradient to reach the neighbouring plants. In this case, the distance between the emitting and the receiver plants appears to be a major factor for the intensity of SAR activation in the receiver plant.
+
+In this paper, we will study the effect of distance between *A. thaliana P. brassicae*’s egg-treated plants (i.e. the sender) and egg-free plants (i.e. the receiver) on the SAR activation intensity in the egg-free plant.
+To do so, all the plants were inoculated with rifampicin-resistant *Pseudomonas syringae* and colony forming units (CFU) per cm^2^ were calculated after incubation. If the SAR activation intensity in the egg-free plant is distance dependent, a decrease of the CFU/cm^2^ in the egg-free plants should be observed with the reduction of the distance between the egg-infected and the egg-free plant.
+
+
+## Data
+
+We read and process the data that were produced by some colleagues and I during our Bachelor.
+
+```{r}
+#| output: false
+# Read data
+my_data <- read.csv(here("data", "raw", "all_data.csv"), sep = ";", dec = ".")
+my_data
+```
+
+```{r}
+#| output: false
+#2 Processing data 
+my_data[my_data == "na"] <- NA
+
+pro_data <- my_data %>% 
+  select(neighbour_3cm, neighbour_6cm, neighbour_9cm, neighbour_12cm) %>%
+  drop_na() %>% 
+  mutate(neighbour_12cm = as.numeric(neighbour_12cm))
+
+head(pro_data, 5)
+str(pro_data)
+
+#store mean y at each distance into a vector 
+y_00 <- colMeans(pro_data[sapply(pro_data, is.numeric)])
+df <- data.frame(y_00)
+y_01 <- as.vector(df$y)
+  
+#store distance variable into a vector 
+x <- c(3, 6, 9, 12)
+
+#create a vector containing the sd of y
+
+y_sd <- sapply(pro_data, sd)
+
+#another type of table to represent the data 
+
+m <- read.csv(here("data", "raw", "lm_eggfree.csv"), header = TRUE, sep = ";", dec = ",")
+str(m)
+
+```
+## Analysis/Results
+We wanted to test the amount of bacteria per cm2 in function of the different distances. The distance is the quantitative explanatory variable and the CFU/cm2 (amount of bacteria) is the quantitative response variable, hence we applied a linear regression.
+
+```{r}
+lm_model <- lm(y_01~x)
+lm_model
+```
+
+@fig-0 shows the linear regression model slope and ordinate at origin with the distribution of the data at each distance.
+
+```{r}
+#| label: fig-0
+#| fig-cap: "Bacterial growth depending on the distance."
+#| fig-width: 8
+#| fig-height: 4
+#| warning: false
+ggplot(m,aes(distance,cfu))+
+  ggtitle("Bacterial growth depending on the distance")+
+  xlab("Distance in centimeters")+ ylab(expression(CFU/cm^2))+
+  geom_point(col= unibePastelS()[1])+
+  ylim(6,11)+ xlim(0,12.5)+
+  geom_abline(intercept = 7.32964, slope = 0.08679)
+```
+
+
+
+@fig-1 shows the linear regression model used to analyse the previous data set.
+
+```{r}
+#| label: fig-1
+#| fig-cap: "Bacterial growth depending on the distance."
+#| fig-width: 8
+#| fig-height: 4
+ggplot(df,aes(x,y_01))+
+  ggtitle("Bacterial growth depending on the distance")+
+  xlab("Distance in centimeters")+ ylab(expression(CFU/cm^2))+
+  geom_point()+
+  geom_errorbar(aes(ymax=y_01+y_sd,ymin=y_01-y_sd),width=0.5, col = unibeRedS()[1])+
+  ylim(6,11)+ xlim(0,12.5)+
+  geom_abline(intercept = 7.32964, slope = 0.08679)
+
+```
+
+@fig-2 another way to show the standard deviation in the same linear regression model used to analyse the previous data set.
+
+```{r}
+#| label: fig-2
+#| fig-cap: "Bacterial growth depending on the distance."
+#| fig-width: 8
+#| fig-height: 4
+ggplot(df,aes(x,y_01))+
+  ggtitle("Bacterial growth depending on the distance")+
+  xlab("Distance in centimeters")+ ylab(expression(CFU/cm^2))+
+  geom_point()+
+  geom_linerange(x =x, ymin =y_01, ymax= 7.32964+0.08679*x, col= unibeApricotS()[1])+
+  ylim(6,11)+ xlim(0,12.5)+
+  geom_abline(intercept = 7.32964, slope = 0.08679)
+```
+@fig-3 shows the correlation between the distance and the CFU/cm^2.
+
+```{r}
+#| label: fig-3
+#| fig-cap: "Correlation between bacterial growth and the distance from egg-treated and egg-free plants."
+#| fig-width: 8
+#| fig-height: 4
+
+x <- m[, 1:2]
+correlation <- cor(x)
+corrplot(correlation, method = "number" , tl.col="black", col = c(unibeMustard(), unibeApricot(),unibeRed(), unibeViolet()))
+```
+And lastly, here is the p-value of the model: 
+```{r}
+#| echo: false
+summary(lm(m$cfu~m$distance))
+```
+
+# Conclusion
+
+The model seems pertinent because we had a significant p-value (p-value = 0.04923 < 0.05). The trend is positive as well (intercept = 7.32964 and slope = 0.08679).
+As shown in the Figure 3, the correlation is positive and small (0.25), which may be explained by the high standard deviation.
+A positive correlation exists between the amount of bacteria and distance. Thus, both factors are dependent and one of them could affect the other one.
+
+It could be explained by the fact that the SAR signal promotes a resistance against bacterias in the neighbouring plants, which are not treated with eggs. So when the SAR signal decreases by distance (our results : p-value = 0.0492 < 0.05)m the neighbouring plants are more favourable to develop pathogens like bacterias. In other words, when a plant has insect eggs on its leaves, it triggers the SAR signal. This signal is transmitted more efficiently to the closest egg-free plants than the distant ones.
+
+## References
+1. Karban, R. Plant behaviour and communication. Ecology Letters 11, 727–739 (2008).
+2. Karban, R., Baldwin, I. T., Baxter, K. J., Laue, G. & Felton, G. W. Communication between plants: induced resistance in wild tobacco plants following clipping of neighboring sagebrush. Oecologia 125, 66–71 (2000).
+3. Karban, R. & Shiojiri, K. Self-recognition affects plant communication and defense. Ecology Letters 12, 502–506 (2009).
+4. Lanoue, A., Burlat, V., Schurr, U. & Röse, U.
+S. R. Induced root-secreted phenolic compounds as a belowground plant defense. Plant Signaling & Behavior 5, 1037–1038 (2010).
+5. Ryals, J. A. et al. Systemic Acquired Resistance. The Plant Cell 8, 1809–1819 (1996).
+6. Gouhier-Darimont, C., Stahl, E., Glauser, G. & Reymond, P. The Arabidopsis Lectin Receptor Kinase LecRK-I.8 Is Involved in Insect Egg Perception. Front Plant Sci 10, 623 (2019).
+7. Insect eggs induce a systemic acquired resistance in Arabidopsis - Hilfiker - 2014 - The Plant Journal - Wiley Online Library. https://onlinelibrary.wiley.com/doi/full/10.111 1/tpj.12707.
+8. Gouhier-Darimont, C., Schmiesing, A., Bonnet, C., Lassueur, S. & Reymond, P. Signalling of Arabidopsis thaliana response to Pieris brassicae eggs shares similarities with
+PAMP-triggered immunity. J Exp Bot 64, 665– 674 (2013).
+9. Orlovskis Z. , unpublished results.
+
