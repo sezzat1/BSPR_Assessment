@@ -1,30 +1,30 @@
-
-usethis::use_git_remote(url = 'https://github.com/sezzat1/BSPR-assessment.git', overwrite = TRUE)
-use_github()
-
-library(usethis)
-
-gitcreds_get()
-gitcreds::gitcreds_set()
-git remote add origin https://github.com/sezzat1/BSPR-assessment
-
-credentials::set_github_pat()
-library(usethis)
-use_git_config(user.name = "sezzat1", user.email = "sara.ezzat@unibe.ch")
+plot_01 <- ggplot(df,aes(x,y_01))+
+  ggtitle("Bacterial growth depending on the distance")+
+  xlab("Distance in centimeters")+ ylab(expression(CFU/cm^2))+
+  geom_point()+
+  geom_errorbar(aes(ymax=y_01+y_sd,ymin=y_01-y_sd),width=0.5, col = unibeRedS()[1])+
+  ylim(6,11)+ xlim(0,12.5)+
+  geom_abline(intercept = 7.32964, slope = 0.08679)
 
 
-gitcreds::gitcreds_set()3
-
-usethis::git_remotes()
-usethis::use_git_remote( "origin","https://github.com/sezzat1/BSPR-assessment.git",overwrite = TRUE)
-
-
-gitcreds::gitcreds_set()
-
-gitcreds_get()
-
-use_git_config()
+plot_02 <- ggplot(df,aes(x,y_01))+
+  ggtitle("Bacterial growth depending on the distance")+
+  xlab("Distance in centimeters")+ ylab(expression(CFU/cm^2))+
+  geom_point()+
+  geom_linerange(x =x, ymin =y_01, ymax= 7.32964+0.08679*x, col= unibeApricotS()[1])+
+  ylim(6,11)+ xlim(0,12.5)+
+  geom_abline(intercept = 7.32964, slope = 0.08679)
 
 
-usethis::use_git_remote("origin", url = 'https://github.com/sezzat1/BSPR-assessment.git' , overwrite = TRUE)
-usethis::use_git_remote("origin", url = NULL, overwrite = TRUE)
+plot_03 <- ggplot(m,aes(distance,cfu))+
+  ggtitle("Bacterial growth depending on the distance")+
+  xlab("Distance in centimeters")+ ylab(expression(CFU/cm^2))+
+  geom_point(col= unibePastelS()[1])+
+  ylim(6,11)+ xlim(0,12.5)+
+  geom_abline(intercept = 7.32964, slope = 0.08679)
+
+
+#correlation
+x <- m[, 1:2]
+correlation <- cor(x)
+corrplot(correlation, method = "number" , tl.col="black", col = c(unibeMustard(), unibeApricot(),unibeRed(), unibeViolet()))
